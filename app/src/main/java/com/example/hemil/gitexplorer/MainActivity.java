@@ -1,5 +1,6 @@
 package com.example.hemil.gitexplorer;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,11 +15,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.squareup.okhttp.OkHttpClient;
 
-import org.json.JSONArray;
+
+import com.google.gson.*;
+import java.util.List;
 
 import RestAPI.RestApiClass;
 import retrofit.RestAdapter;
@@ -27,9 +31,12 @@ import retrofit.client.OkClient;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    JSONArray response;
-    ListView repoListView;
+  //  JSONObject[] response;
+   JsonArray response;
 
+ //  List<JSONObject> response;
+    ListView repoListView;
+    DrawerLayout drawer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -50,8 +57,17 @@ public class MainActivity extends AppCompatActivity
         new FetchRepoListAsync().execute();
     }
 
-    public void showListView(JSONArray list){
+    public void showListView(JsonArray list){
+        repoListView.setAdapter(new PopulateRepoList(this,list));
 
+        repoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getApplicationContext(),ShowCommitActivity.class);
+                intent.putExtra("name",response.get(position).getAsJsonObject().get("name").toString());
+                startActivity(intent);
+            }
+        });
     }
     @Override
     public void onBackPressed() {
@@ -117,7 +133,7 @@ private class FetchRepoListAsync extends AsyncTask<Void,Void,Void>{
     @Override
     protected void onPreExecute(){
         final OkHttpClient okHttpClient = new OkHttpClient();
-        String url = "https://api.github.com/orgs/netflix/repos";
+        String url = "https://api.github.com";
         restAdapter = new RestAdapter.Builder()
                 .setEndpoint(url)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
@@ -130,15 +146,22 @@ private class FetchRepoListAsync extends AsyncTask<Void,Void,Void>{
         final RestApiClass restApiClass = restAdapter.create(RestApiClass.class);
         response = restApiClass.getRepoList();
 
-        Log.d("Repo", response.toString());
+     //   Log.d("Response", String.valueOf(restApiClass.getRepoList().get(0)));
+//        try {
+          Log.d("Repo", response.get(0).toString());
+
+        Log.d("Image",response.get(0).getAsJsonObject().get("owner").getAsJsonObject().get("avatar_url").toString());
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
 //stuff that updates ui
-                if (response.length() > 0)
-
-                showListView(response);
+                if (response.size() > 0)
+                    showListView(response);
 
             }
         });

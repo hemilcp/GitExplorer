@@ -1,4 +1,7 @@
+package com.example.hemil.gitexplorer;
+
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,10 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.hemil.gitexplorer.R;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 /**
  * Created by hemil on 5/25/2016.
@@ -19,7 +21,8 @@ public class PopulateRepoList extends BaseAdapter {
 
 
     Context context;
-    JSONArray jsonArray;
+    JsonArray jsonArray;
+  //  JSONObject[] jsonArray;
     LayoutInflater layoutInflater;
     Holder holder;
     static class Holder{
@@ -27,7 +30,7 @@ public class PopulateRepoList extends BaseAdapter {
         TextView name, desc, fork, commit;
     }
 
-    public PopulateRepoList(Context context, JSONArray jsonArray){
+    public PopulateRepoList(Context context, JsonArray jsonArray){
         this.context = context;
         this.jsonArray = jsonArray;
         layoutInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
@@ -35,7 +38,7 @@ public class PopulateRepoList extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return jsonArray.length();
+        return jsonArray.size();
     }
 
     @Override
@@ -71,17 +74,24 @@ public class PopulateRepoList extends BaseAdapter {
         }
 
         try {
-            Picasso.with(context).load( jsonArray.getJSONObject(position).get("avatar_url").toString()).into( holder.imageView);
-            holder.name.setText(jsonArray.getJSONObject(position).get("full_name").toString());
-            holder.desc.setText(jsonArray.getJSONObject(position).get("description").toString());
-            holder.fork.setText(jsonArray.getJSONObject(position).get("forks_count").toString());
-            holder.commit.setText(jsonArray.getJSONObject(position).get("watchers").toString());
 
-        } catch (JSONException e) {
+//    if(jsonArray.get(position).getAsJsonObject().get("owner").getAsJsonObject().has("avatar_url")){
+//        Picasso.with(context).load( jsonArray.get(position).getAsJsonObject().get("owner").getAsJsonObject().get("avatar_url").toString()).into( holder.imageView);
+//    }else            holder.imageView.setImageResource(R.drawable.noimage);
+
+            String str = jsonArray.get(position).getAsJsonObject().get("owner").getAsJsonObject().get("avatar_url").toString();
+            str = str.substring(1,str.length()-1);
+            Picasso.with(context).load( str).into( holder.imageView);
+            holder.name.setText((jsonArray.get(position)).getAsJsonObject().get("full_name").toString());
+            holder.desc.setText(jsonArray.get(position).getAsJsonObject().get("description").toString());
+            holder.fork.setText(jsonArray.get(position).getAsJsonObject().get("forks_count").toString());
+            holder.commit.setText(jsonArray.get(position).getAsJsonObject().get("watchers").toString());
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        holder.imageView.setScaleType(ImageView.ScaleType.FIT_XY);
 
-        return null;
+
+        return convertView;
     }
 }

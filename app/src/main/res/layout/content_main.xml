@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainActivity_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,17 +14,20 @@
     tools:context="com.example.hemil.gitexplorer.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+
     <TextView
-        android:layout_gravity="center"
-        android:textSize="30dp"
+        android:textColor="#804d00"
+        android:gravity="center"
+        android:textSize="25dp"
         android:textStyle="bold"
         android:typeface="normal"
         android:text="NetFlix Repositories"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <ListView
     android:id="@+id/repoListView"
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
